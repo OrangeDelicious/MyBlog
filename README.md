@@ -9,7 +9,7 @@
 
 #### 1.前端
 
-- 模板引擎：[Themleaf](https://www.thymeleaf.org/)
+- 模板引擎：[Themeleaf](https://www.thymeleaf.org/)
 
 - CSS框架：[Semantic UI](https://semantic-ui.com/)
 
