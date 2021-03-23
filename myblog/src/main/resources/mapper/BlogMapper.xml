@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tianxu.dao.BlogMapper">
+
+    <resultMap id="resultblog11" type="com.tianxu.pojo.Blog" autoMapping="true"> <!--加上个autoMapping才可以啊，好奇怪-->
+        <id property="id" column="id"/>
+        <association property="type" javaType="com.tianxu.pojo.Type">
+            <id property="id" column="typeid"/>
+            <result property="name" column="typename"/>
+        </association>
+        <association property="user" javaType="com.tianxu.pojo.User">
+            <result property="nickname" column="usernickname"/>
+            <result property="avatar" column="useravatar"/>
+        </association>
+        <collection property="tags" ofType="com.tianxu.pojo.Tag">
+            <id property="id" column="tagid"/>
+            <result property="name" column="tagname"/>
+        </collection>
+    </resultMap>
+    <select id="findAll" resultMap="resultblog11">
+        select b.*,ty.name as typename, tt.id as tagid,tt.name as tagname, tu.nickname as usernickname, tu.avatar as useravatar, ty.id as typeid
+        from t_blog b, t_blog_tags tbt, t_tag tt, t_type ty, t_user tu
+        where b.type_id = ty.id and b.user_id = tu.id and b.id = tbt.blogs_id and tbt.tags_id = tt.id
+        order by b.update_time DESC
+
+
+    </select>
+
+    <select id="findById" resultMap="resultblog11">
+        select b.*,ty.name as typename, tt.id as tagid,tt.name as tagname, tu.nickname as usernickname, tu.avatar as useravatar, ty.id as typeid
+        from t_blog b, t_blog_tags tbt, t_tag tt, t_type ty, t_user tu
+        where b.type_id = ty.id and b.user_id = tu.id and b.id = tbt.blogs_id and tbt.tags_id = tt.id
+              and b.id=#{id}
+    </select>
+
+    <select id="findAllByTypeAndTag" resultMap="resultblog11">
+        select b.*,ty.name as typename, tt.id as tagid,tt.name as tagname, tu.nickname as usernickname, tu.avatar as useravatar, ty.id as typeid
+        from t_blog b, t_blog_tags tbt, t_tag tt, t_type ty, t_user tu
+        where b.type_id = ty.id and b.user_id = tu.id and b.id = tbt.blogs_id and tbt.tags_id = tt.id
+        <if test="typeId!=null">
+            and ty.id=#{typeId}
+        </if>
+        <if test="title!=null">
+            and b.title like concat('%',#{title},'%')
+        </if>
+<!--          and ty.id=#{typeId} and b.title like concat('%',#{title},'%')-->
+    </select>
+
+    <select id="findAllByContent" resultMap="resultblog11">
+        select b.*,ty.name as typename, tt.id as tagid,tt.name as tagname, tu.nickname as usernickname, tu.avatar as useravatar, ty.id as typeid
+        from t_blog b, t_blog_tags tbt, t_tag tt, t_type ty, t_user tu
+        where b.type_id = ty.id and b.user_id = tu.id and b.id = tbt.blogs_id and tbt.tags_id = tt.id
+        <if test="text!=null">
+            and b.content like concat('%',#{text},'%')
+        </if>
+
+    </select>
+
+    <update id="updateBlog" parameterType="com.tianxu.pojo.Blog">
+        update t_blog
+        set title=#{title}, content=#{content},appreciation=#{appreciation},commentabled=#{commentabled},
+            content=#{content},create_time=#{createTime},first_picture=#{firstPicture},flag=#{flag},
+            published=#{published},recommend=#{recommend},share_statement=#{shareStatement},
+            update_time=#{updateTime},views=#{views},type_id=#{typeId_my},user_id=#{userId},tag_ids=#{tagIds}
+            ,type_id_my=#{typeId_my},description=#{description}
+        /*typeid，userid是没有的兄弟，得用if判断一手*/
+        where id=#{id}
+    </update>
+    <insert id="save" parameterType="com.tianxu.pojo.Blog" useGeneratedKeys="true" keyProperty="id">
+        insert into t_blog
+        (appreciation, commentabled, content, create_time, first_picture, flag, published, recommend, share_statement, title, update_time, views, type_id, user_id, tag_ids, type_id_my, description)
+            /*typeid，userid是没有的兄弟，得用if判断一手*/
+        values (#{appreciation}, #{commentabled}, #{content}, #{createTime}, #{firstPicture}, #{flag}, #{published}, #{recommend}, #{shareStatement},
+                #{title}, #{updateTime},#{views} ,#{typeId_my} ,#{userId} , #{tagIds}, #{typeId_my}, #{description})
+    </insert>
+
+    <delete id="deleteById">
+        delete from t_blog
+        where id=#{id}
+    </delete>
+
+    <delete id="deleteBlogToTags">
+        delete from t_blog_tags where blogs_id = #{blogs_id}
+    </delete>
+
+    <insert id="saveBlogtoTags">
+        insert into t_blog_tags (blogs_id, tags_id) VALUES
+        (#{blog_id},#{tag_id})
+    </insert>
+
+    <select id="findAllByType" resultMap="resultblog11">
+        select tb.*, tt.name as typename, tu.nickname as usernickname, tu.avatar as useravatar
+        from t_blog tb left join t_type tt on tt.id = tb.type_id, t_user tu
+        where tb.type_id = #{type_id}
+    </select>
+
+    <select id="findAllByTag" resultMap="resultblog11">
+        select b.*,ty.name as typename, tt.id as tagid,tt.name as tagname, tu.nickname as usernickname, tu.avatar as useravatar
+        from t_blog b, t_blog_tags tbt, t_tag tt, t_type ty, t_user tu
+        where b.type_id = ty.id and b.user_id = tu.id and b.id = tbt.blogs_id and tbt.tags_id = tt.id and tt.id = #{tag_id}
+        order by b.update_time DESC
+    </select>
+
+    <update id="updateView">
+        update t_blog
+        set views=#{views}
+        where id=#{id}
+    </update>
+</mapper>

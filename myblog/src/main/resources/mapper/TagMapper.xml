@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tianxu.dao.TagMapper">
+    <resultMap id="tagresult" type="com.tianxu.pojo.Tag" autoMapping="true">
+        <id property="id" column="id"/>
+        <collection property="blogs" ofType="com.tianxu.pojo.Blog" autoMapping="true">
+            <id property="id" column="bid"/>
+        </collection>
+    </resultMap>
+    <select id="getTagByName" resultType="com.tianxu.pojo.Tag">
+        select * from t_tag where name=#{name}
+    </select>
+
+    <insert id="save" parameterType="com.tianxu.pojo.Tag">
+        insert into t_tag
+        (name) VALUES (#{name})
+    </insert>
+
+    <select id="findById" resultMap="tagresult">
+        select tt.id as id, tt.name as name, tb.*, tb.id as bid
+        from t_tag tt left join t_blog_tags tbt on tt.id = tbt.tags_id left join t_blog tb on tb.id = tbt.blogs_id
+        where tt.id=#{id}
+    </select>
+
+    <select id="findAll" resultMap="tagresult">
+        select tt.id as id, tt.name as name, tb.*, tb.id as bid
+        from t_tag tt left join t_blog_tags tbt on tt.id = tbt.tags_id left join t_blog tb on tb.id = tbt.blogs_id
+    </select>
+
+    <select id="findAllById" resultMap="tagresult">
+        select tt.id as id, tt.name as name, tb.*, tb.id as bid
+        from t_tag tt left join t_blog_tags tbt on tt.id = tbt.tags_id left join t_blog tb on tb.id = tbt.blogs_id
+        where tt.id in
+        <foreach collection="idlist" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+
+    </select>
+
+    <delete id="deleteById">
+        delete from t_tag
+        where id=#{id}
+    </delete>
+
+    <update id="updateTag" parameterType="com.tianxu.pojo.Tag">
+        update t_tag set name=#{name}
+        where id=#{id}
+    </update>
+</mapper>

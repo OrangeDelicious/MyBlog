@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tianxu.dao.TypeMapper">
+    <resultMap id="typeresult" type="com.tianxu.pojo.Type" autoMapping="true">
+        <id property="id" column="id"/>
+        <collection property="blogs" ofType="com.tianxu.pojo.Blog" autoMapping="true">
+            <id property="id" column="bid"/>
+        </collection>
+    </resultMap>
+
+    <select id="getTypeByName" resultType="com.tianxu.pojo.Type">
+        select *
+        from t_type where name=#{name}
+    </select>
+
+    <insert id="save" parameterType="com.tianxu.pojo.Type">
+        insert into t_type
+        (name) VALUES (#{name})
+    </insert>
+
+    <select id="findById" resultMap="typeresult">
+        select t.id as id, t.name as name,tb.*, tb.id as bid
+        from t_type t left join t_blog tb on t.id = tb.type_id
+        where t.id=#{id}
+    </select>
+
+    <select id="findAll" resultMap="typeresult">
+        select t.id as id, t.name as name,tb.*, tb.id as bid
+        from t_type t left join t_blog tb on t.id = tb.type_id
+    </select>
+
+    <delete id="deleteById">
+        delete from t_type where id=#{id}
+    </delete>
+
+    <update id="updateType" parameterType="com.tianxu.pojo.Type">
+        update t_type set name=#{name}
+        where id=#{id}
+    </update>
+
+</mapper>
