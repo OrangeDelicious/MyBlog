@@ -1,7 +1,6 @@
 # MyBlog
 个人博客系统（SpringBoot+Mybatis+Redis）
 
-博客地址：http://82.156.185.213/ （还未申请域名）
 
 
 
